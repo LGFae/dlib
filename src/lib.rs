@@ -127,6 +127,12 @@
 //! #[cfg(not(feature = "dlopen-foo"))]
 //! use ffi::*;
 //! ```
+//!
+//! ## A note on `#![no_std]` support
+//!
+//! Deactivating the `std` dependency through `default-features = false` will stop `dlib` from
+//! importing `libloading`. This means in `no_std` environments, users of this library *must*
+//! link their binaries, and not use `dlopen`.
 #![no_std]
 #![warn(missing_docs)]
 
