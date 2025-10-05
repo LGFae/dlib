@@ -127,6 +127,7 @@
 //! #[cfg(not(feature = "dlopen-foo"))]
 //! use ffi::*;
 //! ```
+#![no_std]
 #![warn(missing_docs)]
 
 extern crate libloading;
@@ -240,8 +241,8 @@ pub enum DlError {
     MissingSymbol(&'static str),
 }
 
-impl std::error::Error for DlError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+impl core::error::Error for DlError {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match *self {
             DlError::CantOpen(ref e) => Some(e),
             DlError::MissingSymbol(_) => None,
@@ -249,8 +250,8 @@ impl std::error::Error for DlError {
     }
 }
 
-impl std::fmt::Display for DlError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for DlError {
+    fn fmt(&self, f: &mut core::fmt::Formatter) ->core::fmt::Result {
         match *self {
             DlError::CantOpen(ref e) => write!(f, "Could not open the requested library: {}", e),
             DlError::MissingSymbol(s) => write!(f, "The requested symbol was missing: {}", s),
@@ -287,7 +288,7 @@ macro_rules! dlopen_external_library(
     impl $structname {
         pub unsafe fn open(name: &str) -> Result<$structname, $crate::DlError> {
             // we use it to ensure the 'static lifetime
-            use std::mem::transmute;
+            use core::mem::transmute;
             let lib = $crate::Library::new(name).map_err($crate::DlError::CantOpen)?;
             let s = $structname {
                 $($($sname: {
