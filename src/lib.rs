@@ -130,10 +130,14 @@
 #![no_std]
 #![warn(missing_docs)]
 
+#[cfg(feature = "std")]
 extern crate libloading;
 
+#[cfg(feature = "std")]
 pub use libloading::Error as LibLoadingError;
+
 #[doc(hidden)]
+#[cfg(feature = "std")]
 pub use libloading::{Library, Symbol};
 
 /// Macro for generically invoking a FFI function
@@ -236,6 +240,7 @@ pub enum DlError {
     ///
     /// Includes the error reported by `libloading` when trying to
     /// open the library.
+    #[cfg(feature = "std")]
     CantOpen(LibLoadingError),
     /// Some required symbol was missing in the library
     MissingSymbol(&'static str),
@@ -244,6 +249,7 @@ pub enum DlError {
 impl core::error::Error for DlError {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match *self {
+            #[cfg(feature = "std")]
             DlError::CantOpen(ref e) => Some(e),
             DlError::MissingSymbol(_) => None,
         }
@@ -251,8 +257,9 @@ impl core::error::Error for DlError {
 }
 
 impl core::fmt::Display for DlError {
-    fn fmt(&self, f: &mut core::fmt::Formatter) ->core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match *self {
+            #[cfg(feature = "std")]
             DlError::CantOpen(ref e) => write!(f, "Could not open the requested library: {}", e),
             DlError::MissingSymbol(s) => write!(f, "The requested symbol was missing: {}", s),
         }
